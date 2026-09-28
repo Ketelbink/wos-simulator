@@ -40,11 +40,14 @@ export function applyToolsBeartrapDraft(current: SideState, unknownDraft: unknow
     state.troops.marksman = total - state.troops.infantry - state.troops.lancer;
   }
   const heroes = Array.isArray(first?.heroes) ? first.heroes : [];
+  const heroDetails = record(draft.heroDetails);
   const slug = (name: string) => name.toLocaleLowerCase("en").replace(/[^a-z0-9]/g, "");
   for (let index = 0; index < categories.length; index++) {
     const id = heroes[index];
     if (typeof id !== "string" || !id || id === "random-l80") continue;
-    const hero = HEROES.find(entry => slug(entry.name) === slug(id) &&
+    const exportedName = record(heroDetails?.[id])?.name;
+    const name = typeof exportedName === "string" ? exportedName : id;
+    const hero = HEROES.find(entry => slug(entry.name) === slug(name) &&
       entry.categories.includes(categories[index]));
     if (hero) state.heroes[categories[index]] = { name: hero.name, skills: [0, 0, 0, 0] };
   }
