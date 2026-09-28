@@ -1,6 +1,7 @@
 """RapidOCR v3 adapter for the legacy rapidocr-onnxruntime call shape."""
 from __future__ import annotations
 
+import os
 from typing import Any
 
 
@@ -27,6 +28,9 @@ def _default_params(*, use_angle_cls: bool = False) -> dict[str, Any]:
         "Rec.model_type": mobile,
         "Rec.ocr_version": ppocrv5,
     }
+    if thread_count := os.environ.get("WOS_OCR_ONNX_THREADS"):
+        params["EngineConfig.onnxruntime.intra_op_num_threads"] = int(thread_count)
+        params["EngineConfig.onnxruntime.inter_op_num_threads"] = int(thread_count)
     if use_angle_cls:
         params.update(
             {
