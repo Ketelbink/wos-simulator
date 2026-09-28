@@ -146,7 +146,7 @@ export async function POST(req: NextRequest) {
       );
     });
 
-    child.on("close", (code) => {
+    child.on("close", (code, signal) => {
       clearTimeout(kill);
       if (code !== 0) {
         // The CLI emits JSON errors on stdout even on failure; try to forward it.
@@ -163,7 +163,9 @@ export async function POST(req: NextRequest) {
                 timedOut
                   ? `OCR process timed out after ${OCR_TIMEOUT_MS}ms`
                   : (parsedErr as { error?: string })?.error ||
-                    `OCR process exited with code ${code}`,
+                    (signal
+                      ? `OCR process stopped by ${signal}${stderr.trim() ? `: ${stderr.trim().slice(-500)}` : ""}`
+                      : `OCR process exited with code ${code}${stderr.trim() ? `: ${stderr.trim().slice(-500)}` : ""}`),
               stderr: stderr.slice(0, 4000),
             },
             { status: 500 },
