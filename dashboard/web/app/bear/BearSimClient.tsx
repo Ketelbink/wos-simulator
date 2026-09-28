@@ -823,7 +823,7 @@ export default function BearSimClient({
 
   return (
     <div
-      className={`simulate-workspace ${presentation === "deploy" ? "deploy-client-workspace" : ""}`}
+      className={`simulate-workspace bear-sim-page ${presentation === "deploy" ? "deploy-client-workspace" : ""}`}
       data-presentation={presentation}
       onFocusCapture={selectFocusedInputText}
       onMouseUpCapture={keepFocusSelectionOnMouseUp}
