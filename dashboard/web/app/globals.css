@@ -1451,6 +1451,35 @@ body {
   }
 }
 
+.bear-start-card {
+  max-width: 54rem;
+}
+
+.bear-army-panel,
+.bear-results-panel {
+  max-width: 54rem;
+}
+
+@media (min-width: 1024px) {
+  .bear-action-dock {
+    right: auto;
+    left: calc(13rem + max(24px, calc((100vw - 13rem - 1500px) / 2 + 24px)));
+    width: min(54rem, calc(100vw - 13rem - max(24px, calc((100vw - 13rem - 1500px) / 2 + 24px)) - 24px));
+    grid-template-columns: max-content minmax(0, 1fr);
+  }
+
+  .bear-action-dock .sim-action-card-run,
+  .bear-action-dock .sim-action-card-optimize {
+    grid-column: auto;
+    justify-self: stretch;
+    width: auto;
+  }
+
+  .bear-action-dock .sim-action-card-run {
+    justify-self: start;
+  }
+}
+
 /* Give Bear Sim the desktop canvas and readable controls while keeping mobile compact. */
 @media (min-width: 1024px) {
   .bear-start-card,
@@ -1505,34 +1534,6 @@ body {
   }
 }
 
-.bear-start-card {
-  max-width: 54rem;
-}
-
-.bear-army-panel,
-.bear-results-panel {
-  max-width: 54rem;
-}
-
-@media (min-width: 1024px) {
-  .bear-action-dock {
-    right: auto;
-    left: calc(13rem + max(24px, calc((100vw - 13rem - 1500px) / 2 + 24px)));
-    width: min(54rem, calc(100vw - 13rem - max(24px, calc((100vw - 13rem - 1500px) / 2 + 24px)) - 24px));
-    grid-template-columns: max-content minmax(0, 1fr);
-  }
-
-  .bear-action-dock .sim-action-card-run,
-  .bear-action-dock .sim-action-card-optimize {
-    grid-column: auto;
-    justify-self: stretch;
-    width: auto;
-  }
-
-  .bear-action-dock .sim-action-card-run {
-    justify-self: start;
-  }
-}
 
 @media (min-width: 1200px) {
   .sim-tabs-narrow {
