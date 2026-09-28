@@ -65,6 +65,19 @@ function resolvePython(): string {
   return "python3";
 }
 
+function parseCliJson(output: string): unknown {
+  // RapidOCR may log to stdout before the parser's pretty-printed JSON.
+  const starts = [...output.matchAll(/^\{/gm)].map((match) => match.index);
+  for (const start of starts.reverse()) {
+    try {
+      return JSON.parse(output.slice(start).trim());
+    } catch {
+      // This brace belonged to a log message or incomplete output.
+    }
+  }
+  throw new Error("No complete JSON result from OCR parser");
+}
+
 export async function POST(req: NextRequest) {
   const contentLength = Number.parseInt(req.headers.get("content-length") ?? "0", 10);
   if (Number.isFinite(contentLength) && contentLength > OCR_MAX_REQUEST_BYTES) {
@@ -161,11 +174,18 @@ export async function POST(req: NextRequest) {
       clearTimeout(kill);
       if (code !== 0) {
         const elapsedMs = Date.now() - startedAt;
-        const stderrLastLine = stderr.trim().split(/\r?\n/).at(-1)?.slice(0, 200);
+        const stderrHint = stderr
+          .replace(/\x1b\[[\d;]*m/g, "")
+          .trim()
+          .split(/\r?\n/)
+          .filter((line) => !line.includes("[INFO]"))
+          .slice(-5)
+          .join(" ")
+          .slice(-700);
         // The CLI emits JSON errors on stdout even on failure; try to forward it.
         let parsedErr: unknown = null;
         try {
-          parsedErr = JSON.parse(stdout);
+          parsedErr = parseCliJson(stdout);
         } catch {
           /* ignore */
         }
@@ -177,8 +197,8 @@ export async function POST(req: NextRequest) {
                   ? `OCR process timed out after ${OCR_TIMEOUT_MS}ms`
                   : (parsedErr as { error?: string })?.error ||
                     (signal
-                      ? `OCR process stopped by ${signal} after ${elapsedMs}ms${stderrLastLine ? `: ${stderrLastLine}` : ""}`
-                      : `OCR process exited with code ${code} after ${elapsedMs}ms${stderrLastLine ? `: ${stderrLastLine}` : ""}`),
+                      ? `OCR process stopped by ${signal} after ${elapsedMs}ms${stderrHint ? `: ${stderrHint}` : ""}`
+                      : `OCR process exited with code ${code} after ${elapsedMs}ms${stderrHint ? `: ${stderrHint}` : ""}`),
               stderr: stderr.slice(0, 4000),
             },
             { status: 500 },
@@ -187,7 +207,7 @@ export async function POST(req: NextRequest) {
         return;
       }
       try {
-        const parsed = JSON.parse(stdout);
+        const parsed = parseCliJson(stdout);
         finish(NextResponse.json(parsed));
       } catch (err) {
         finish(
