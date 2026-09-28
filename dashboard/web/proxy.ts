@@ -46,7 +46,10 @@ export async function proxy(req: NextRequest) {
 
   const { pathname } = req.nextUrl;
   if (pathname === "/") {
-    return NextResponse.redirect(new URL("/simulate", req.url));
+    const destination = process.env.WOS_SIM_AUTH_ENABLED === "1"
+      ? "https://sim.wos-2277.net/simulate"
+      : new URL("/simulate", req.url);
+    return NextResponse.redirect(destination);
   }
 
   if (isAllowedPublicPath(pathname)) return NextResponse.next();
