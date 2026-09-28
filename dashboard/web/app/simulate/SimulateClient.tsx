@@ -718,7 +718,7 @@ export default function SimulateClient({
         setAttacker(current => applyToolsBeartrapDraft(current, payload));
         setRallyMode(true);
         setMobileTab("attacker");
-        setToolsDraftNotice("Tools Beartrap setup imported. Check the values before running. This simulator currently uses a general battle model; it does not calculate a validated Beartrap score. Unknown stats and buffs were not transferred.");
+        setToolsDraftNotice("Tools Beartrap setup imported. Check the values before running. This simulator currently uses a general battle model; it does not calculate a validated Beartrap score. Troop counts require a saved ratio and capacity; otherwise they start at zero. Unknown tiers, stats and buffs still show simulator defaults. Verify every field.");
       } catch {
         setToolsDraftNotice("The Tools draft could not be loaded. It may have expired or already been used.");
       }
