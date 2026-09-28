@@ -74,6 +74,7 @@ import {
   type SideState,
 } from "@/lib/simulate/form-state";
 import { deployRunHref } from "@/lib/simulate/deploy-route";
+import { applyToolsBeartrapDraft } from "@/lib/simulate/tools-beartrap-draft";
 
 const RALLY_MODE = true;
 const RECENT_RUNS_PAGE_SIZE = 20;
@@ -335,6 +336,8 @@ export default function BearSimClient({
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
   const [uploadOpen, setUploadOpen] = useState(false);
   const [uploadWarnings, setUploadWarnings] = useState<string[]>([]);
+  const [toolsDraftNotice, setToolsDraftNotice] = useState<string | null>(null);
+  const toolsDraftLoadedRef = useRef(false);
   const [workspaceTab, setWorkspaceTab] = useState<BearWorkspaceTab>(() =>
     initialState.result || initialState.optimizeResult ? "results" : "setup",
   );
@@ -369,6 +372,34 @@ export default function BearSimClient({
   const recentRunsRequestSequenceRef = useRef(0);
   const loadedRunIdRef = useRef<string | null>(initialSavedRun?.id ?? null);
   const previousInitialRunIdRef = useRef<string | null>(initialRunId);
+
+  useEffect(() => {
+    if (toolsDraftLoadedRef.current) return;
+    const url = new URL(window.location.href);
+    const draft = url.searchParams.get("draft");
+    if (!draft) return;
+    toolsDraftLoadedRef.current = true;
+    url.searchParams.delete("draft");
+    window.history.replaceState(window.history.state, "", url.pathname + url.search + url.hash);
+    if (!/^[a-f0-9]{64}$/.test(draft)) {
+      setToolsDraftNotice("The Tools draft link is invalid.");
+      return;
+    }
+    void (async () => {
+      try {
+        const response = await fetch("/api/tools-draft?draft=" + encodeURIComponent(draft), {
+          credentials: "same-origin", cache: "no-store",
+        });
+        if (!response.ok) throw new Error("draft");
+        const payload: unknown = await response.json();
+        setPlayer(current => applyToolsBeartrapDraft(current, payload));
+        setWorkspaceTab("setup");
+        setToolsDraftNotice("Tools Beartrap plan imported. Check troop counts, tiers, heroes, skills, stats and buffs before running Bear Sim. Missing values may still show simulator defaults.");
+      } catch {
+        setToolsDraftNotice("The Tools draft could not be loaded. It may have expired or already been used.");
+      }
+    })();
+  }, []);
 
   useEffect(() => {
     try {
@@ -843,6 +874,13 @@ export default function BearSimClient({
               points at this saved snapshot.
             </span>
           ) : null}
+        </div>
+      )}
+
+      {toolsDraftNotice && (
+        <div className="sim-tool-panel mb-4 px-3 py-2 text-xs" role="status"
+          style={{ color: "var(--sim-yellow)" }}>
+          {toolsDraftNotice}
         </div>
       )}
 
