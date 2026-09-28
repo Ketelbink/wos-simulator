@@ -23,6 +23,7 @@ export function applyToolsBeartrapDraft(current: SideState, unknownDraft: unknow
     const choice = `t${tier}${Number(fc) > 0 ? `_fc${fc}` : ""}`;
     if (TROOP_TIERS.includes(choice)) state.tiers[category] = choice;
   }
+  state.troops = { infantry: 0, lancer: 0, marksman: 0 };
   const capacity = record(draft.capacities);
   const total = capacity?.rally_bear ?? capacity?.rally_standard;
   const plan = record(draft.plan);
