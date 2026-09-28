@@ -1532,6 +1532,37 @@ body {
   .bear-army-panel .sim-preview-pill span {
     font-size: 11px;
   }
+
+  /* Match the reading size of Tools on desktop without changing mobile controls. */
+  .bear-sim-page:not(.deploy-client-workspace) {
+    font-size: 16px;
+  }
+
+  .bear-sim-page:not(.deploy-client-workspace) :is(.text-xs, [class~="text-[9px]"], [class~="text-[10px]"], [class~="text-[11px]"], [class~="text-[12px]"]) {
+    font-size: 14px;
+    line-height: 1.45;
+  }
+
+  .bear-sim-page:not(.deploy-client-workspace) :is(.text-sm, .sim-tab, .sim-edit-chip, .sim-upload-primary, .sim-run-button, .sim-optimize-run-button) {
+    font-size: 16px;
+  }
+
+  .bear-sim-page:not(.deploy-client-workspace) :is(.sim-unit-name, .sim-field-label, .sim-stat-edit-head, .sim-summary-head, .sim-troop-ratio-labels, .sim-summary-table, .sim-summary-name, .sim-summary-line, .sim-summary-modifier, .sim-preview-pill, .sim-preview-pill span, .sim-profile-button, .sim-mode-status-detail, .sim-mode-status-label, .sim-mode-option-copy, .sim-mode-tab, .sim-options-close, .sim-mode-secondary-button) {
+    font-size: 14px;
+  }
+
+  .bear-sim-page:not(.deploy-client-workspace) .sim-input {
+    min-height: 46px;
+    font-size: 16px;
+  }
+
+  .bear-sim-page:not(.deploy-client-workspace) .sim-profile-button {
+    min-height: 38px;
+  }
+
+  .bear-sim-page:not(.deploy-client-workspace) :is(.sim-troop-ratio, .sim-troop-ratio-track) {
+    height: 32px;
+  }
 }
 
 
