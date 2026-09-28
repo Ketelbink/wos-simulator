@@ -46,6 +46,7 @@ import {
   type SavedSimulationRunResponse,
 } from "@/lib/simulate-run";
 import {
+  cleanStatPresetName,
   loadLocalStatPresets,
   type PlayerStatPreset,
 } from "@/lib/stat-presets";
@@ -337,6 +338,7 @@ export default function BearSimClient({
   const [uploadOpen, setUploadOpen] = useState(false);
   const [uploadWarnings, setUploadWarnings] = useState<string[]>([]);
   const [toolsDraftNotice, setToolsDraftNotice] = useState<string | null>(null);
+  const [toolsPlayerName, setToolsPlayerName] = useState<string | null>(null);
   const toolsDraftLoadedRef = useRef(false);
   const [workspaceTab, setWorkspaceTab] = useState<BearWorkspaceTab>(() =>
     initialState.result || initialState.optimizeResult ? "results" : "setup",
@@ -393,6 +395,13 @@ export default function BearSimClient({
         if (!response.ok) throw new Error("draft");
         const payload: unknown = await response.json();
         setPlayer(current => applyToolsBeartrapDraft(current, payload));
+        if (payload && typeof payload === "object" && "player" in payload) {
+          const sourcePlayer = payload.player;
+          if (sourcePlayer && typeof sourcePlayer === "object" && "name" in sourcePlayer) {
+            const name = cleanStatPresetName(sourcePlayer.name);
+            if (name) setToolsPlayerName(name);
+          }
+        }
         setWorkspaceTab("setup");
         setToolsDraftNotice("Tools Beartrap plan imported. Check troop counts, tiers, heroes, skills, stats and buffs before running Bear Sim. Missing values may still show simulator defaults.");
       } catch {
@@ -1082,7 +1091,7 @@ export default function BearSimClient({
       {presetOpen && (
         <PlayerStatProfileModal
           title="Bear profile"
-          defaultName="Bear profile"
+          defaultName={toolsPlayerName ?? "Bear profile"}
           currentStats={heroAdjustedStats(player, "subtract")}
           presets={statPresets}
           setPresets={setStatPresets}
