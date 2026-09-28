@@ -14,6 +14,7 @@ import difflib
 import io
 import json
 import logging
+import os
 import re
 import shutil
 import subprocess
@@ -1400,6 +1401,9 @@ def _get_fire_crystal_badge_classifier() -> Any | None:
         ort.set_default_logger_severity(3)
         options = ort.SessionOptions()
         options.log_severity_level = 3
+        if thread_count := os.environ.get("WOS_OCR_ONNX_THREADS"):
+            options.intra_op_num_threads = int(thread_count)
+            options.inter_op_num_threads = int(thread_count)
         _fc_badge_classifier_session = ort.InferenceSession(
             str(FC_BADGE_CLASSIFIER_MODEL),
             sess_options=options,
