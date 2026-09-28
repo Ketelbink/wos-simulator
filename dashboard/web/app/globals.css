@@ -1538,7 +1538,7 @@ body {
     font-size: 16px;
   }
 
-  .bear-sim-page:not(.deploy-client-workspace) :is(.text-xs, .text-\\[9px\\], .text-\\[10px\\], .text-\\[11px\\], .text-\\[12px\\]) {
+  .bear-sim-page:not(.deploy-client-workspace) :is(.text-xs, [class~="text-[9px]"], [class~="text-[10px]"], [class~="text-[11px]"], [class~="text-[12px]"]) {
     font-size: 14px;
     line-height: 1.45;
   }
