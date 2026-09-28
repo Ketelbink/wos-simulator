@@ -1480,6 +1480,61 @@ body {
   }
 }
 
+/* Give Bear Sim the desktop canvas and readable controls while keeping mobile compact. */
+@media (min-width: 1024px) {
+  .bear-start-card,
+  .bear-army-panel,
+  .bear-results-panel {
+    max-width: min(100%, 72rem);
+  }
+
+  .bear-action-dock {
+    width: min(72rem, calc(100vw - 13rem - max(24px, calc((100vw - 13rem - 1500px) / 2 + 24px)) - 24px));
+  }
+
+  .bear-army-panel .sim-role-panel {
+    padding: 18px;
+  }
+
+  .bear-army-panel .sim-unit-row {
+    grid-template-columns: 6.5rem minmax(0, 1fr) minmax(5.5rem, 0.42fr) minmax(9rem, 1.15fr);
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .bear-army-panel .sim-unit-name,
+  .bear-army-panel .sim-field-label,
+  .bear-army-panel .sim-stat-edit-head,
+  .bear-army-panel .sim-summary-head,
+  .bear-army-panel .sim-troop-ratio-labels {
+    font-size: 12px;
+  }
+
+  .bear-army-panel .sim-input {
+    min-height: 42px;
+    font-size: 14px;
+  }
+
+  .bear-army-panel .sim-troop-ratio,
+  .bear-army-panel .sim-troop-ratio-track {
+    height: 28px;
+  }
+
+  .bear-army-panel .sim-summary-table,
+  .bear-army-panel .sim-summary-name,
+  .bear-army-panel .sim-summary-line,
+  .bear-army-panel .sim-preview-pill,
+  .bear-army-panel .sim-profile-button {
+    font-size: 12px;
+  }
+
+  .bear-army-panel .sim-summary-modifier,
+  .bear-army-panel .sim-preview-pill span {
+    font-size: 11px;
+  }
+}
+
+
 @media (min-width: 1200px) {
   .sim-tabs-narrow {
     display: none;
