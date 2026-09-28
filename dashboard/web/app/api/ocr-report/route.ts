@@ -139,6 +139,12 @@ export async function POST(req: NextRequest) {
     const child = spawn(python, ["-c", OCR_BOOTSTRAP, CLI_PATH], {
       cwd: REPO_ROOT,
       stdio: ["pipe", "pipe", "pipe"],
+      env: {
+        ...process.env,
+        WOS_OCR_ONNX_THREADS: "1",
+        OMP_NUM_THREADS: "1",
+        OPENBLAS_NUM_THREADS: "1",
+      },
       // Plesk sends SIGINT to this child shortly after spawn. The bootstrap
       // ignores it before importing NumPy; the timeout still sends SIGKILL.
       detached: process.platform !== "win32",
