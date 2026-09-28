@@ -17,6 +17,7 @@ export function isAllowedPublicPath(pathname: string): boolean {
   if (pathname === "/icon.svg") return true;
   if (pathname.startsWith("/examples/")) return true;
   if (pathname === "/api/ocr-report") return true;
+  if (pathname === "/api/tools-draft") return true;
   if (
     pathname === "/api/simulate/runs" ||
     pathname.startsWith("/api/simulate/runs/")
