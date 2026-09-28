@@ -27,5 +27,8 @@ export async function callToolsBridge(action: BridgeAction, token: string): Prom
 export async function isSimAdmin(token: string | undefined): Promise<boolean> {
   if (!token || !/^[a-f0-9]{64}$/.test(token)) return false;
   const result = await callToolsBridge("verify", token);
-  return result?.ok === true;
+  if (!result?.ok) return false;
+  const data: unknown = await result.json().catch(() => null);
+  return data !== null && typeof data === "object" &&
+    "authorized" in data && data.authorized === true;
 }
