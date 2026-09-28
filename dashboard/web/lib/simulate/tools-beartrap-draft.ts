@@ -1,10 +1,12 @@
-import { HEROES, TROOP_TIERS, type TroopCategory } from "@/lib/heroes-catalogue";
+import { HEROES, TROOP_TIERS, skillSlotEnabled, type TroopCategory } from "@/lib/heroes-catalogue";
 import type { SideState } from "@/lib/simulate/form-state";
 
 type RecordValue = Record<string, unknown>;
 const categories: TroopCategory[] = ["infantry", "lancer", "marksman"];
 const record = (value: unknown): RecordValue | null =>
   value !== null && typeof value === "object" && !Array.isArray(value) ? value as RecordValue : null;
+const skillLevel = (value: unknown): number =>
+  typeof value === "number" && Number.isInteger(value) && value >= 0 && value <= 5 ? value : 0;
 
 export function applyToolsBeartrapDraft(current: SideState, unknownDraft: unknown): SideState {
   const draft = record(unknownDraft);
@@ -48,10 +50,23 @@ export function applyToolsBeartrapDraft(current: SideState, unknownDraft: unknow
   const slug = (name: string) => name.toLocaleLowerCase("en").replace(/[^a-z0-9]/g, "");
   for (const id of heroes) {
     if (typeof id !== "string" || !id || id === "random-l80") continue;
-    const exportedName = record(heroDetails?.[id])?.name;
+    const details = record(heroDetails?.[id]);
+    const exportedName = details?.name;
     const name = typeof exportedName === "string" ? exportedName : id;
     const hero = HEROES.find(entry => slug(entry.name) === slug(name));
-    if (hero?.troopType) state.heroes[hero.troopType] = { name: hero.name, skills: [0, 0, 0, 0] };
+    if (!hero?.troopType) continue;
+    const progress = record(details?.progress);
+    const expedition = record(record(details?.skillLevels)?.expedition);
+    const skills: [number, number, number, number] = [
+      skillLevel(progress?.skill),
+      skillLevel(expedition?.["2"]),
+      skillLevel(expedition?.["3"]),
+      0,
+    ];
+    for (const slot of [1, 2, 3] as const) {
+      if (!skillSlotEnabled(hero, slot, true)) skills[slot - 1] = 0;
+    }
+    state.heroes[hero.troopType] = { name: hero.name, skills };
   }
   return state;
 }
