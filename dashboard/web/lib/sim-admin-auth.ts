@@ -1,0 +1,31 @@
+import "server-only";
+
+export const SIM_COOKIE = "__Host-wos_sim_session";
+
+type BridgeAction = "exchange" | "verify";
+
+export async function callToolsBridge(action: BridgeAction, token: string): Promise<Response | null> {
+  const url = process.env.WOS_TOOLS_AUTH_URL;
+  const secret = process.env.WOS_SIM_BRIDGE_SECRET;
+  if (!url || !url.startsWith("https://") || !secret || secret.length < 32) return null;
+  try {
+    return await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Simulator-Bridge": secret,
+      },
+      body: JSON.stringify({ action, token }),
+      cache: "no-store",
+      signal: AbortSignal.timeout(5000),
+    });
+  } catch {
+    return null;
+  }
+}
+
+export async function isSimAdmin(token: string | undefined): Promise<boolean> {
+  if (!token || !/^[a-f0-9]{64}$/.test(token)) return false;
+  const result = await callToolsBridge("verify", token);
+  return result?.ok === true;
+}
