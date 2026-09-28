@@ -237,14 +237,14 @@ export default function SiteNav({
         }}
       >
         <div className="mb-6">
-          <h1 className="text-sm font-bold uppercase tracking-widest opacity-60">
+          <h1 className="text-base font-bold uppercase tracking-widest opacity-60">
             WOS Sim
           </h1>
-          <p className="text-xs opacity-40 mt-1">{subtitle}</p>
+          <p className="text-sm opacity-60 mt-1">{subtitle}</p>
         </div>
         {groups.map((group) => (
           <div key={group.title} className="mb-3 last:mb-0">
-            <div className="px-3 pb-1 text-[10px] font-bold uppercase tracking-wider opacity-40">
+            <div className="px-3 pb-1 text-xs font-bold uppercase tracking-wider opacity-60">
               {group.title}
             </div>
             {group.links.map((link) => {
@@ -253,7 +253,7 @@ export default function SiteNav({
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="nav-link block px-3 py-2 rounded text-sm transition-colors"
+                  className="nav-link block px-3 py-2 rounded text-base transition-colors"
                   aria-current={active ? "page" : undefined}
                   style={
                     active
