@@ -9,8 +9,9 @@ export const maxDuration = 60;
 const REPO_ROOT = path.join(/*turbopackIgnore: true*/ process.cwd(), "../..");
 const CLI_PATH = path.join(REPO_ROOT, "skill", "scripts", "report_stats_parser.py");
 const OCR_BOOTSTRAP = [
-  "import signal, runpy, sys",
+  "import os, signal, runpy, sys",
   "signal.signal(signal.SIGINT, signal.SIG_IGN)",
+  "sys.path.insert(0, os.path.dirname(sys.argv[1]))",
   "sys.argv = [sys.argv[1]]",
   "runpy.run_path(sys.argv[0], run_name='__main__')",
 ].join("; ");
