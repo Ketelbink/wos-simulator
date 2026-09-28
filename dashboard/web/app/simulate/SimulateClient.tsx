@@ -119,6 +119,7 @@ import {
   type SideState,
 } from "@/lib/simulate/form-state";
 import { deployRunHref } from "@/lib/simulate/deploy-route";
+import { applyToolsBeartrapDraft } from "@/lib/simulate/tools-beartrap-draft";
 import {
   formatBattleOutcome,
   formatMeanSurvivorCount,
@@ -535,6 +536,8 @@ export default function SimulateClient({
   const [error, setError] = useState<string | null>(null);
   const [uploadOpen, setUploadOpen] = useState(false);
   const [uploadWarnings, setUploadWarnings] = useState<string[]>([]);
+  const [toolsDraftNotice, setToolsDraftNotice] = useState<string | null>(null);
+  const toolsDraftLoadedRef = useRef(false);
   const [rallyMode, setRallyMode] = useState(() => initialState.rallyMode);
   const [mobileTab, setMobileTab] = useState<SimWorkspaceTab>(() =>
     initialState.result || initialState.optimizeResult || initialState.surfaceResult ? "results" : "attacker",
@@ -692,6 +695,35 @@ export default function SimulateClient({
   const initialResultsScrollDoneRef = useRef(false);
   const { selectFocusedInputText, keepFocusSelectionOnMouseUp } =
     useAutoSelectInputs();
+
+  useEffect(() => {
+    if (toolsDraftLoadedRef.current) return;
+    const url = new URL(window.location.href);
+    const draft = url.searchParams.get("draft");
+    if (!draft) return;
+    toolsDraftLoadedRef.current = true;
+    url.searchParams.delete("draft");
+    window.history.replaceState(window.history.state, "", url.pathname + url.search + url.hash);
+    if (!/^[a-f0-9]{64}$/.test(draft)) {
+      setToolsDraftNotice("The Tools draft link is invalid.");
+      return;
+    }
+    void (async () => {
+      try {
+        const response = await fetch("/api/tools-draft?draft=" + encodeURIComponent(draft), {
+          credentials: "same-origin", cache: "no-store",
+        });
+        if (!response.ok) throw new Error("draft");
+        const payload: unknown = await response.json();
+        setAttacker(current => applyToolsBeartrapDraft(current, payload));
+        setRallyMode(true);
+        setMobileTab("attacker");
+        setToolsDraftNotice("Tools Beartrap setup imported. Check the values before running. This simulator currently uses a general battle model; it does not calculate a validated Beartrap score. Unknown stats and buffs were not transferred.");
+      } catch {
+        setToolsDraftNotice("The Tools draft could not be loaded. It may have expired or already been used.");
+      }
+    })();
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -1771,6 +1803,13 @@ export default function SimulateClient({
           }}
           onKeepEnabled={dismissToast}
         />
+      )}
+
+      {toolsDraftNotice && (
+        <div className="sim-tool-panel mb-4 px-3 py-2 text-xs" role="status"
+          style={{ color: "var(--sim-yellow)" }}>
+          {toolsDraftNotice}
+        </div>
       )}
 
       {uploadWarnings.length > 0 && (
