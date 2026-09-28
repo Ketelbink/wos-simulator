@@ -110,6 +110,7 @@ export async function POST(req: NextRequest) {
   }
 
   return new Promise<Response>((resolve) => {
+    const startedAt = Date.now();
     const finish = (response: Response) => {
       releaseOcrSlot();
       resolve(response);
@@ -152,6 +153,8 @@ export async function POST(req: NextRequest) {
     child.on("close", (code, signal) => {
       clearTimeout(kill);
       if (code !== 0) {
+        const elapsedMs = Date.now() - startedAt;
+        const stderrLastLine = stderr.trim().split(/\r?\n/).at(-1)?.slice(0, 200);
         // The CLI emits JSON errors on stdout even on failure; try to forward it.
         let parsedErr: unknown = null;
         try {
@@ -167,8 +170,8 @@ export async function POST(req: NextRequest) {
                   ? `OCR process timed out after ${OCR_TIMEOUT_MS}ms`
                   : (parsedErr as { error?: string })?.error ||
                     (signal
-                      ? `OCR process stopped by ${signal}${stderr.trim() ? `: ${stderr.trim().slice(-500)}` : ""}`
-                      : `OCR process exited with code ${code}${stderr.trim() ? `: ${stderr.trim().slice(-500)}` : ""}`),
+                      ? `OCR process stopped by ${signal} after ${elapsedMs}ms${stderrLastLine ? `: ${stderrLastLine}` : ""}`
+                      : `OCR process exited with code ${code} after ${elapsedMs}ms${stderrLastLine ? `: ${stderrLastLine}` : ""}`),
               stderr: stderr.slice(0, 4000),
             },
             { status: 500 },
