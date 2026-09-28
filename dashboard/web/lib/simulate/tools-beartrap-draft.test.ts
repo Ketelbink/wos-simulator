@@ -30,3 +30,21 @@ test("Unknown draft kind cannot alter the form", () => {
   const original = defaultSide();
   assert.equal(applyToolsBeartrapDraft(original, { version: 1, simulator: "other" }), original);
 });
+
+test("Beartrap heroes follow their troop type, not the Battle Plan slot order", () => {
+  const original = defaultSide();
+  original.heroes.infantry = { name: "Jeronimo", skills: [5, 5, 5, 0] };
+  const result = applyToolsBeartrapDraft(original, {
+    version: 1, simulator: "beartrap",
+    heroDetails: {
+      "hero-bradley": { name: "Bradley", troopType: "marksman" },
+      "hero-hector": { name: "Hector", troopType: "infantry" },
+      "hero-mia": { name: "Mia", troopType: "lancer" },
+    },
+    plan: { squads: [{ heroes: ["hero-bradley", "hero-hector", "hero-mia"], ratio: [3, 7, 90] }] },
+  });
+  assert.equal(result.heroes.infantry.name, "Hector");
+  assert.equal(result.heroes.lancer.name, "Mia");
+  assert.equal(result.heroes.marksman.name, "Bradley");
+  assert.equal(original.heroes.infantry.name, "Jeronimo");
+});
