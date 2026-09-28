@@ -118,6 +118,9 @@ export async function POST(req: NextRequest) {
     const child = spawn(python, [CLI_PATH], {
       cwd: REPO_ROOT,
       stdio: ["pipe", "pipe", "pipe"],
+      // Passenger can signal the Node process group while the OCR request runs.
+      // Keep the child in its own group; our timeout still kills its PID.
+      detached: process.platform !== "win32",
     });
 
     let stdout = "";
