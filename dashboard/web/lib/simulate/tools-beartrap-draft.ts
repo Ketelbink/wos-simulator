@@ -11,7 +11,11 @@ export function applyToolsBeartrapDraft(current: SideState, unknownDraft: unknow
   if (!draft || draft.version !== 1 || draft.simulator !== "beartrap") return current;
   const state: SideState = {
     ...current, troops: { ...current.troops }, tiers: { ...current.tiers },
-    heroes: { ...current.heroes },
+    heroes: {
+      infantry: { name: null, skills: [0, 0, 0, 0] },
+      lancer: { name: null, skills: [0, 0, 0, 0] },
+      marksman: { name: null, skills: [0, 0, 0, 0] },
+    },
   };
   const types = record(draft.troops);
   for (const category of categories) {
@@ -42,14 +46,12 @@ export function applyToolsBeartrapDraft(current: SideState, unknownDraft: unknow
   const heroes = Array.isArray(first?.heroes) ? first.heroes : [];
   const heroDetails = record(draft.heroDetails);
   const slug = (name: string) => name.toLocaleLowerCase("en").replace(/[^a-z0-9]/g, "");
-  for (let index = 0; index < categories.length; index++) {
-    const id = heroes[index];
+  for (const id of heroes) {
     if (typeof id !== "string" || !id || id === "random-l80") continue;
     const exportedName = record(heroDetails?.[id])?.name;
     const name = typeof exportedName === "string" ? exportedName : id;
-    const hero = HEROES.find(entry => slug(entry.name) === slug(name) &&
-      entry.categories.includes(categories[index]));
-    if (hero) state.heroes[categories[index]] = { name: hero.name, skills: [0, 0, 0, 0] };
+    const hero = HEROES.find(entry => slug(entry.name) === slug(name));
+    if (hero?.troopType) state.heroes[hero.troopType] = { name: hero.name, skills: [0, 0, 0, 0] };
   }
   return state;
 }
