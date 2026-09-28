@@ -23,7 +23,13 @@ export async function GET(request: NextRequest) {
   }
   // Plesk forwards requests to Next through localhost:3000. Never return that
   // internal origin to the browser after exchanging a ticket.
-  const response = NextResponse.redirect("https://sim.wos-2277.net/simulate", 303);
+  const draft = request.nextUrl.searchParams.get("draft");
+  if (draft !== null && !/^[a-f0-9]{64}$/.test(draft)) {
+    return new NextResponse("Invalid simulator draft", { status: 400 });
+  }
+  const destination = new URL("https://sim.wos-2277.net/simulate");
+  if (draft) destination.searchParams.set("draft", draft);
+  const response = NextResponse.redirect(destination, 303);
   response.cookies.set(SIM_COOKIE, data.session, {
     httpOnly: true, secure: true, sameSite: "lax", path: "/", maxAge: 43200,
   });
