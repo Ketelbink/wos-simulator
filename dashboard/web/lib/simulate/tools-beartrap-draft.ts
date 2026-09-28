@@ -19,7 +19,7 @@ export function applyToolsBeartrapDraft(current: SideState, unknownDraft: unknow
     const tier = row?.tier;
     const fc = row?.fc;
     if ((tier !== 10 && tier !== 11) || (fc !== null && fc !== undefined &&
-      (!Number.isInteger(fc) || Number(fc) < 0 || Number(fc) > 10))) continue;
+      (typeof fc !== "number" || !Number.isInteger(fc) || fc < 0 || fc > 10))) continue;
     const choice = `t${tier}${Number(fc) > 0 ? `_fc${fc}` : ""}`;
     if (TROOP_TIERS.includes(choice)) state.tiers[category] = choice;
   }
