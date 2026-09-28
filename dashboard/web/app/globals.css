@@ -1547,7 +1547,7 @@ body {
     font-size: 16px;
   }
 
-  .bear-sim-page:not(.deploy-client-workspace) :is(.sim-unit-name, .sim-field-label, .sim-stat-edit-head, .sim-summary-head, .sim-troop-ratio-labels, .sim-summary-name, .sim-summary-line, .sim-preview-pill, .sim-profile-button) {
+  .bear-sim-page:not(.deploy-client-workspace) :is(.sim-unit-name, .sim-field-label, .sim-stat-edit-head, .sim-summary-head, .sim-troop-ratio-labels, .sim-summary-table, .sim-summary-name, .sim-summary-line, .sim-summary-modifier, .sim-preview-pill, .sim-preview-pill span, .sim-profile-button, .sim-mode-status-detail, .sim-mode-status-label, .sim-mode-option-copy, .sim-mode-tab, .sim-options-close, .sim-mode-secondary-button) {
     font-size: 14px;
   }
 
