@@ -8,6 +8,12 @@ export const maxDuration = 60;
 
 const REPO_ROOT = path.join(/*turbopackIgnore: true*/ process.cwd(), "../..");
 const CLI_PATH = path.join(REPO_ROOT, "skill", "scripts", "report_stats_parser.py");
+const OCR_BOOTSTRAP = [
+  "import signal, runpy, sys",
+  "signal.signal(signal.SIGINT, signal.SIG_IGN)",
+  "sys.argv = [sys.argv[1]]",
+  "runpy.run_path(sys.argv[0], run_name='__main__')",
+].join("; ");
 const OCR_TIMEOUT_MS = 55_000;
 const OCR_MAX_IMAGE_BYTES = parsePositiveInt(
   process.env.OCR_MAX_IMAGE_BYTES,
@@ -116,11 +122,11 @@ export async function POST(req: NextRequest) {
       resolve(response);
     };
 
-    const child = spawn(python, [CLI_PATH], {
+    const child = spawn(python, ["-c", OCR_BOOTSTRAP, CLI_PATH], {
       cwd: REPO_ROOT,
       stdio: ["pipe", "pipe", "pipe"],
-      // Passenger can signal the Node process group while the OCR request runs.
-      // Keep the child in its own group; our timeout still kills its PID.
+      // Plesk sends SIGINT to this child shortly after spawn. The bootstrap
+      // ignores it before importing NumPy; the timeout still sends SIGKILL.
       detached: process.platform !== "win32",
     });
 
