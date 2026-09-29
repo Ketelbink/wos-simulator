@@ -31,7 +31,7 @@ export function applyToolsBeartrapDraft(current: SideState, unknownDraft: unknow
   }
   state.troops = { infantry: 0, lancer: 0, marksman: 0 };
   const capacity = record(draft.capacities);
-  const total = capacity?.rally_bear ?? capacity?.rally_standard;
+  const total = capacity?.solo_bear;
   const plan = record(draft.plan);
   const squads = Array.isArray(plan?.squads) ? plan.squads : [];
   const first = record(squads[0]);
