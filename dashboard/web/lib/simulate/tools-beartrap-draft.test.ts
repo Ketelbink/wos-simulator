@@ -8,7 +8,7 @@ test("Beartrap draft maps known tiers and first squad ratio without changing sou
   const draft = {
     version: 1, simulator: "beartrap",
     troops: { infantry: { tier: 10, fc: 7 }, lancer: { tier: 11, fc: 5 } },
-    capacities: { rally_bear: 196050 },
+    capacities: { solo_bear: 196050 },
     plan: { squads: [{ ratio: ["1", "19", "80"], heroes: ["", "", ""] }] },
   };
   const result = applyToolsBeartrapDraft(original, draft);
@@ -18,10 +18,28 @@ test("Beartrap draft maps known tiers and first squad ratio without changing sou
   assert.equal(original.troops.infantry, 50000);
 });
 
+test("Beartrap import uses solo capacity even when a larger rally capacity exists", () => {
+  const result = applyToolsBeartrapDraft(defaultSide(), {
+    version: 1, simulator: "beartrap",
+    capacities: { solo_bear: 179960, rally_bear: 1331460, rally_standard: 1331460 },
+    plan: { squads: [{ ratio: [3, 7, 90] }] },
+  });
+  assert.deepEqual(result.troops, { infantry: 5398, lancer: 12597, marksman: 161965 });
+});
+
+test("Missing Beartrap solo capacity never substitutes a rally capacity", () => {
+  const result = applyToolsBeartrapDraft(defaultSide(), {
+    version: 1, simulator: "beartrap",
+    capacities: { solo_bear: null, rally_bear: 1331460, rally_standard: 1331460 },
+    plan: { squads: [{ ratio: [3, 7, 90] }] },
+  });
+  assert.deepEqual(result.troops, { infantry: 0, lancer: 0, marksman: 0 });
+});
+
 test("Missing ratio starts with zero troops instead of misleading simulator counts", () => {
   const result = applyToolsBeartrapDraft(defaultSide(), {
     version: 1, simulator: "beartrap",
-    capacities: { rally_bear: 196050 }, plan: null,
+    capacities: { solo_bear: 196050 }, plan: null,
   });
   assert.deepEqual(result.troops, { infantry: 0, lancer: 0, marksman: 0 });
 });
