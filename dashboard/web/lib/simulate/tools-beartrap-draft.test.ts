@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { defaultSide } from "./form-state";
+import { defaultSide, toApiPayload } from "./form-state";
 import { applyToolsBeartrapDraft } from "./tools-beartrap-draft";
 
 test("Beartrap draft maps known tiers and first squad ratio without changing source state", () => {
@@ -107,6 +107,45 @@ test("Imported Hector, Mia and Bradley receive their weapon-derived fourth level
   assert.equal(result.heroes.infantry.skills[3], 3);
   assert.equal(result.heroes.lancer.skills[3], 5);
   assert.equal(result.heroes.marksman.skills[3], 4);
+});
+
+test("Tools City, Pet and Gareth preset reaches Bear form and engine payload", () => {
+  const original = defaultSide();
+  const result = applyToolsBeartrapDraft(original, {
+    version: 1, simulator: "beartrap",
+    modifiers: {
+      city: { attack: 20, defense: 0, lethality: 10, health: 0, enemy_attack: 10, enemy_defense: 20 },
+      pets: { attack: 2.5, defense: 0, lethality: 3.5, health: 0,
+        enemy_defense: 7.5, enemy_lethality: 4.5, enemy_health: 2 },
+      gareth: 1.25,
+    },
+  });
+  assert.equal(result.statModifiers.attack, 20);
+  assert.equal(result.statModifiers.enemy_attack, 10);
+  assert.equal(result.petModifiers.enemy_defense, 7.5);
+  assert.equal(result.gareth, 1.25);
+  assert.equal(original.statModifiers.attack, 0);
+  const request = toApiPayload(result, defaultSide(), 1, true);
+  assert.equal(request.attacker.stat_modifiers?.enemy_attack, -10);
+  assert.equal(request.attacker.pet_modifiers?.enemy_defense, -7.5);
+  assert.equal(request.attacker.gareth, 1.25);
+});
+
+test("Out-of-range or incorrectly stepped modifiers are ignored", () => {
+  const result = applyToolsBeartrapDraft(defaultSide(), {
+    version: 1, simulator: "beartrap",
+    modifiers: {
+      city: { attack: 15, enemy_defense: 20 },
+      pets: { attack: 10.5, enemy_health: 2.25, enemy_defense: 8.5 },
+      gareth: 5.25,
+    },
+  });
+  assert.equal(result.statModifiers.attack, 0);
+  assert.equal(result.statModifiers.enemy_defense, 20);
+  assert.equal(result.petModifiers.attack, 0);
+  assert.equal(result.petModifiers.enemy_health, 0);
+  assert.equal(result.petModifiers.enemy_defense, 8.5);
+  assert.equal(result.gareth, 0);
 });
 
 test("Missing and invalid Tools levels do not create simulator skills", () => {

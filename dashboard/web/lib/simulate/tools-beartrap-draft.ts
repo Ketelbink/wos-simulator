@@ -1,5 +1,6 @@
 import { HEROES, TROOP_TIERS, skillSlotEnabled, type TroopCategory } from "@/lib/heroes-catalogue";
 import type { SideState } from "@/lib/simulate/form-state";
+import { applyToolsSimulatorModifiers } from "@/lib/simulate/tools-simulator-modifiers";
 
 type RecordValue = Record<string, unknown>;
 const categories: TroopCategory[] = ["infantry", "lancer", "marksman"];
@@ -14,14 +15,14 @@ const weaponSkillLevel = (value: unknown): number =>
 export function applyToolsBeartrapDraft(current: SideState, unknownDraft: unknown): SideState {
   const draft = record(unknownDraft);
   if (!draft || draft.version !== 1 || draft.simulator !== "beartrap") return current;
-  const state: SideState = {
+  const state: SideState = applyToolsSimulatorModifiers({
     ...current, troops: { ...current.troops }, tiers: { ...current.tiers },
     heroes: {
       infantry: { name: null, skills: [0, 0, 0, 0] },
       lancer: { name: null, skills: [0, 0, 0, 0] },
       marksman: { name: null, skills: [0, 0, 0, 0] },
     },
-  };
+  }, draft.modifiers);
   const types = record(draft.troops);
   for (const category of categories) {
     const row = record(types?.[category]);
