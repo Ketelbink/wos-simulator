@@ -2703,3 +2703,23 @@ body {
     gap: 22px;
   }
 }
+
+/* Keep Bear Sim controls in the document flow on narrow screens so the army stays visible. */
+@media (max-width: 640px) {
+  .bear-sim-page[data-presentation="dashboard"] {
+    padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  .bear-sim-page[data-presentation="dashboard"] .bear-action-dock {
+    position: static;
+    width: 100%;
+    margin: 0 0 1rem;
+    padding: 0;
+    box-shadow: none;
+  }
+
+  .bear-sim-page[data-presentation="dashboard"] .sim-skill-strip select {
+    min-height: 44px;
+    font-size: 14px;
+  }
+}
