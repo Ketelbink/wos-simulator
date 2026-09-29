@@ -314,6 +314,24 @@ function buildInitialBearSavedRunState(
   };
 }
 
+function describeToolsDraftSkills(payload: unknown): string {
+  const draft = payload && typeof payload === "object" ? payload as Record<string, unknown> : {};
+  const details = draft.heroDetails && typeof draft.heroDetails === "object" && !Array.isArray(draft.heroDetails)
+    ? draft.heroDetails as Record<string, unknown> : {};
+  const plan = draft.plan && typeof draft.plan === "object" ? draft.plan as Record<string, unknown> : {};
+  const squads = Array.isArray(plan.squads) ? plan.squads : [];
+  const first = squads[0] && typeof squads[0] === "object" ? squads[0] as Record<string, unknown> : {};
+  const selected = Array.isArray(first.heroes) ? first.heroes.filter((id): id is string => typeof id === "string" && !!id && id !== "random-l80") : [];
+  const missing = selected.filter(id => !Object.prototype.hasOwnProperty.call(details, id));
+  const mapped = applyToolsBeartrapDraft(defaultSide(), payload);
+  const summary = (["infantry", "lancer", "marksman"] as const)
+    .map(category => mapped.heroes[category])
+    .filter(hero => hero.name)
+    .map(hero => `${hero.name} ${hero.skills.slice(0, 3).join("/")}`);
+  if (missing.length) return `No saved hero details for ${missing.join(", ")} in this Tools draft. Imported S1/S2/S3: ${summary.join(", ") || "none"}.`;
+  return `Imported S1/S2/S3: ${summary.join(", ") || "none"}. Zero means no saved level was supplied for that slot.`;
+}
+
 export default function BearSimClient({
   initialRunId = null,
   initialSavedRun = null,
@@ -403,7 +421,7 @@ export default function BearSimClient({
           }
         }
         setWorkspaceTab("setup");
-        setToolsDraftNotice("Tools Beartrap plan imported. Check troop counts, tiers, heroes, skills, stats and buffs before running Bear Sim. Missing values may still show simulator defaults.");
+        setToolsDraftNotice("Tools Beartrap plan imported. " + describeToolsDraftSkills(payload) + " Check stats and buffs before running Bear Sim.");
       } catch {
         setToolsDraftNotice("The Tools draft could not be loaded. It may have expired or already been used.");
       }
