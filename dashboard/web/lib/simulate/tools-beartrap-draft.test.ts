@@ -82,14 +82,14 @@ test("Tools Expedition levels and weapon import without treating Exploration as 
   assert.deepEqual(result.heroes.lancer.skills, [5, 4, 0, 3]);
 });
 
-test("WoS weapon levels 1–10 map in pairs to Sim skill 4 levels 1–5", () => {
+test("WoS weapon upgrades raise Expedition skill 4 only at even levels", () => {
   for (let weapon = 0; weapon <= 10; weapon++) {
     const result = applyToolsBeartrapDraft(defaultSide(), {
       version: 1, simulator: "beartrap",
       heroDetails: { mia: { name: "Mia", progress: { weapon } } },
       plan: { squads: [{ heroes: ["mia"] }] },
     });
-    assert.equal(result.heroes.lancer.skills[3], Math.ceil(weapon / 2), `weapon +${weapon}`);
+    assert.equal(result.heroes.lancer.skills[3], Math.floor(weapon / 2), `weapon +${weapon}`);
   }
 });
 
@@ -105,7 +105,7 @@ test("Imported Hector, Mia and Bradley receive their weapon-derived fourth level
   });
   assert.equal(result.heroes.infantry.skills[3], 3);
   assert.equal(result.heroes.lancer.skills[3], 5);
-  assert.equal(result.heroes.marksman.skills[3], 5);
+  assert.equal(result.heroes.marksman.skills[3], 4);
 });
 
 test("Missing and invalid Tools levels do not create simulator skills", () => {
