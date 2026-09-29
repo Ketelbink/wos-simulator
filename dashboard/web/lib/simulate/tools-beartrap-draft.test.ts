@@ -83,13 +83,14 @@ test("Tools Expedition levels and weapon import without treating Exploration as 
 });
 
 test("WoS weapon upgrades raise Expedition skill 4 only at even levels", () => {
+  const expected = [0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5];
   for (let weapon = 0; weapon <= 10; weapon++) {
     const result = applyToolsBeartrapDraft(defaultSide(), {
       version: 1, simulator: "beartrap",
       heroDetails: { mia: { name: "Mia", progress: { weapon } } },
       plan: { squads: [{ heroes: ["mia"] }] },
     });
-    assert.equal(result.heroes.lancer.skills[3], Math.floor(weapon / 2), `weapon +${weapon}`);
+    assert.equal(result.heroes.lancer.skills[3], expected[weapon], `weapon +${weapon}`);
   }
 });
 
