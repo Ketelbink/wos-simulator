@@ -67,7 +67,7 @@ test("Beartrap heroes follow their troop type, not the Battle Plan slot order", 
   assert.equal(original.heroes.infantry.name, "Jeronimo");
 });
 
-test("Tools Expedition levels import without treating weapon or Exploration as skill 4", () => {
+test("Tools Expedition levels and weapon import without treating Exploration as combat skills", () => {
   const result = applyToolsBeartrapDraft(defaultSide(), {
     version: 1, simulator: "beartrap",
     heroDetails: {
@@ -79,7 +79,18 @@ test("Tools Expedition levels import without treating weapon or Exploration as s
     },
     plan: { squads: [{ heroes: ["renee"], ratio: [1, 19, 80] }] },
   });
-  assert.deepEqual(result.heroes.lancer.skills, [5, 4, 0, 0]);
+  assert.deepEqual(result.heroes.lancer.skills, [5, 4, 0, 3]);
+});
+
+test("WoS weapon levels 1–10 map in pairs to Sim skill 4 levels 1–5", () => {
+  for (let weapon = 0; weapon <= 10; weapon++) {
+    const result = applyToolsBeartrapDraft(defaultSide(), {
+      version: 1, simulator: "beartrap",
+      heroDetails: { mia: { name: "Mia", progress: { weapon } } },
+      plan: { squads: [{ heroes: ["mia"] }] },
+    });
+    assert.equal(result.heroes.lancer.skills[3], Math.ceil(weapon / 2), `weapon +${weapon}`);
+  }
 });
 
 test("Missing and invalid Tools levels do not create simulator skills", () => {
