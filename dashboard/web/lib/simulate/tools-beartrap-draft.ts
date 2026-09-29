@@ -7,6 +7,9 @@ const record = (value: unknown): RecordValue | null =>
   value !== null && typeof value === "object" && !Array.isArray(value) ? value as RecordValue : null;
 const skillLevel = (value: unknown): number =>
   typeof value === "number" && Number.isInteger(value) && value >= 0 && value <= 5 ? value : 0;
+const weaponSkillLevel = (value: unknown): number =>
+  typeof value === "number" && Number.isInteger(value) && value >= 1 && value <= 10
+    ? Math.ceil(value / 2) : 0;
 
 export function applyToolsBeartrapDraft(current: SideState, unknownDraft: unknown): SideState {
   const draft = record(unknownDraft);
@@ -61,7 +64,7 @@ export function applyToolsBeartrapDraft(current: SideState, unknownDraft: unknow
       skillLevel(progress?.skill),
       skillLevel(expedition?.["2"]),
       skillLevel(expedition?.["3"]),
-      0,
+      skillSlotEnabled(hero, 4, true) ? weaponSkillLevel(progress?.weapon) : 0,
     ];
     for (const slot of [1, 2, 3] as const) {
       if (!skillSlotEnabled(hero, slot, true)) skills[slot - 1] = 0;
