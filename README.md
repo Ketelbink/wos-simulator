@@ -106,6 +106,24 @@ cd simulator && npm test
 cd dashboard/web && npm ci && npm test
 ```
 
+## Check the original fork for updates
+
+This repository descends from
+[`piddlyminx/wos-simulator`](https://github.com/piddlyminx/wos-simulator).
+To inspect upstream changes without merging or changing the deployed code:
+
+```bash
+bash scripts/check-upstream.sh > /tmp/wos-upstream-review.md
+```
+
+The report lists upstream commits, changed hero configuration, engine files,
+testcases and dashboard files. It flags paths changed by both repositories for
+manual review. Check the game evidence and run the relevant simulator and
+dashboard tests before selecting any upstream changes. The script fetches Git
+history into local tracking refs; it does not update `main`, import user runs,
+or deploy. On a shallow clone, fetch complete history if the script reports that
+it cannot find a common ancestor.
+
 Docker dev/prod compose files at the repo root bind-mount the component trees
 into the container; see `docker-compose.yml` / `docker-compose.prod.yml`.
 
