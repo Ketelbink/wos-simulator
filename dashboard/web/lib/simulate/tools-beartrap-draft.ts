@@ -9,7 +9,7 @@ const skillLevel = (value: unknown): number =>
   typeof value === "number" && Number.isInteger(value) && value >= 0 && value <= 5 ? value : 0;
 const weaponSkillLevel = (value: unknown): number =>
   typeof value === "number" && Number.isInteger(value) && value >= 1 && value <= 10
-    ? Math.ceil(value / 2) : 0;
+    ? Math.floor(value / 2) : 0;
 
 export function applyToolsBeartrapDraft(current: SideState, unknownDraft: unknown): SideState {
   const draft = record(unknownDraft);
