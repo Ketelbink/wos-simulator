@@ -93,6 +93,21 @@ test("WoS weapon levels 1–10 map in pairs to Sim skill 4 levels 1–5", () => 
   }
 });
 
+test("Imported Hector, Mia and Bradley receive their weapon-derived fourth level", () => {
+  const result = applyToolsBeartrapDraft(defaultSide(), {
+    version: 1, simulator: "beartrap",
+    heroDetails: {
+      hector: { name: "Hector", progress: { weapon: 6 } },
+      mia: { name: "Mia", progress: { weapon: 10 } },
+      bradley: { name: "Bradley", progress: { weapon: 9 } },
+    },
+    plan: { squads: [{ heroes: ["hector", "mia", "bradley"] }] },
+  });
+  assert.equal(result.heroes.infantry.skills[3], 3);
+  assert.equal(result.heroes.lancer.skills[3], 5);
+  assert.equal(result.heroes.marksman.skills[3], 5);
+});
+
 test("Missing and invalid Tools levels do not create simulator skills", () => {
   const result = applyToolsBeartrapDraft(defaultSide(), {
     version: 1, simulator: "beartrap",
