@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
   try { payload = JSON.parse(raw); }
   catch { return NextResponse.json({ error: "invalid_draft" }, { status: 502 }); }
   if (!payload || typeof payload !== "object" || !("version" in payload) || payload.version !== 1 ||
-      !("simulator" in payload) || payload.simulator !== "beartrap") {
+      !("simulator" in payload) || (payload.simulator !== "beartrap" && payload.simulator !== "pvp")) {
     return NextResponse.json({ error: "invalid_draft" }, { status: 502 });
   }
   return NextResponse.json(payload, { headers: {

@@ -412,6 +412,9 @@ export default function BearSimClient({
         });
         if (!response.ok) throw new Error("draft");
         const payload: unknown = await response.json();
+        if (!payload || typeof payload !== "object" || !("simulator" in payload) || payload.simulator !== "beartrap") {
+          throw new Error("draft kind");
+        }
         setPlayer(current => applyToolsBeartrapDraft(current, payload));
         if (payload && typeof payload === "object" && "player" in payload) {
           const sourcePlayer = payload.player;

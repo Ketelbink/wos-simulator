@@ -11,6 +11,7 @@ import {
   type FocusEventHandler,
   type MouseEventHandler,
 } from "react";
+import { applyToolsPvpDraft } from "@/lib/simulate/tools-beartrap-draft";
 import { useSearchParams } from "next/navigation";
 import PlayerStatProfileModal from "@/components/PlayerStatProfileModal";
 import {
@@ -457,6 +458,8 @@ export default function SimulateClient({
     () => buildInitialSavedRunState(initialSavedRun, initialSavedRunError),
     [initialSavedRun, initialSavedRunError],
   );
+  const [toolsDraftNotice, setToolsDraftNotice] = useState<string | null>(null);
+  const toolsDraftLoadedRef = useRef(false);
   const [attacker, setAttacker] = useState<SideState>(
     () => initialState.attacker,
   );
@@ -629,6 +632,37 @@ export default function SimulateClient({
   const initialResultsScrollDoneRef = useRef(false);
   const { selectFocusedInputText, keepFocusSelectionOnMouseUp } =
     useAutoSelectInputs();
+
+  useEffect(() => {
+    if (toolsDraftLoadedRef.current) return;
+    const url = new URL(window.location.href);
+    const draft = url.searchParams.get("draft");
+    if (!draft) return;
+    toolsDraftLoadedRef.current = true;
+    url.searchParams.delete("draft");
+    window.history.replaceState(window.history.state, "", url.pathname + url.search + url.hash);
+    if (!/^[a-f0-9]{64}$/.test(draft)) {
+      setToolsDraftNotice("The Tools draft link is invalid.");
+      return;
+    }
+    void (async () => {
+      try {
+        const response = await fetch("/api/tools-draft?draft=" + encodeURIComponent(draft), {
+          credentials: "same-origin", cache: "no-store",
+        });
+        if (!response.ok) throw new Error("draft");
+        const payload: unknown = await response.json();
+        if (!payload || typeof payload !== "object" || !("simulator" in payload) || payload.simulator !== "pvp") {
+          throw new Error("draft kind");
+        }
+        setAttacker(current => applyToolsPvpDraft(current, payload));
+        setMobileTab("attacker");
+        setToolsDraftNotice("Tools PvP squad imported as attacker. Check both armies, stats and buffs before running the simulation. Report upload is still available.");
+      } catch {
+        setToolsDraftNotice("The Tools draft could not be loaded. It may have expired or already been used.");
+      }
+    })();
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -1603,6 +1637,11 @@ export default function SimulateClient({
       onFocusCapture={selectFocusedInputText}
       onMouseUpCapture={keepFocusSelectionOnMouseUp}
     >
+      {toolsDraftNotice && (
+        <p role="status" className="sim-tool-panel mb-4 p-3 text-sm" style={{ color: "var(--sim-muted)" }}>
+          {toolsDraftNotice}
+        </p>
+      )}
       <Suspense fallback={null}>
         <RunUrlObserver onRunIdChange={setActiveRunId} />
       </Suspense>

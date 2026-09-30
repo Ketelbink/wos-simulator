@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { toolsDraftDestination } from "@/lib/simulate/tools-draft-destination";
 import { callToolsBridge, SIM_COOKIE } from "@/lib/sim-admin-auth";
 
 export async function GET(request: NextRequest) {
@@ -8,6 +9,11 @@ export async function GET(request: NextRequest) {
   const ticket = request.nextUrl.searchParams.get("ticket");
   if (!ticket || !/^[a-f0-9]{64}$/.test(ticket)) {
     return new NextResponse("Invalid access ticket", { status: 401 });
+  }
+  const draft = request.nextUrl.searchParams.get("draft");
+  const destination = toolsDraftDestination(draft, request.nextUrl.searchParams.get("simulator"));
+  if (!destination) {
+    return new NextResponse("Invalid simulator draft or kind", { status: 400 });
   }
   const result = await callToolsBridge("exchange", ticket);
   if (!result?.ok) {
@@ -23,12 +29,6 @@ export async function GET(request: NextRequest) {
   }
   // Plesk forwards requests to Next through localhost:3000. Never return that
   // internal origin to the browser after exchanging a ticket.
-  const draft = request.nextUrl.searchParams.get("draft");
-  if (draft !== null && !/^[a-f0-9]{64}$/.test(draft)) {
-    return new NextResponse("Invalid simulator draft", { status: 400 });
-  }
-  const destination = new URL(draft ? "https://sim.wos-2277.net/bear" : "https://sim.wos-2277.net/simulate");
-  if (draft) destination.searchParams.set("draft", draft);
   const response = NextResponse.redirect(destination, 303);
   response.cookies.set(SIM_COOKIE, data.session, {
     httpOnly: true, secure: true, sameSite: "lax", path: "/", maxAge: 43200,
