@@ -121,5 +121,7 @@ test("Missing and invalid Tools levels do not create simulator skills", () => {
     },
     plan: { squads: [{ heroes: ["jessie"] }] },
   });
-  assert.deepEqual(result.heroes.marksman.skills, [4, 0, 0, 0]);
+  assert.equal(result.heroes.lancer.name, "Jessie");
+  assert.deepEqual(result.heroes.lancer.skills, [4, 0, 0, 0]);
+  assert.deepEqual(result.heroes.marksman.skills, [0, 0, 0, 0]);
 });
