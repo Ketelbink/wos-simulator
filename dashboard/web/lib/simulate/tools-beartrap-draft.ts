@@ -11,9 +11,9 @@ const weaponSkillLevel = (value: unknown): number =>
   typeof value === "number" && Number.isInteger(value) && value >= 1 && value <= 10
     ? Math.floor(value / 2) : 0;
 
-export function applyToolsBeartrapDraft(current: SideState, unknownDraft: unknown): SideState {
+function applyToolsDraft(current: SideState, unknownDraft: unknown, simulator: "beartrap" | "pvp"): SideState {
   const draft = record(unknownDraft);
-  if (!draft || draft.version !== 1 || draft.simulator !== "beartrap") return current;
+  if (!draft || draft.version !== 1 || draft.simulator !== simulator) return current;
   const state: SideState = {
     ...current, troops: { ...current.troops }, tiers: { ...current.tiers },
     heroes: {
@@ -34,7 +34,7 @@ export function applyToolsBeartrapDraft(current: SideState, unknownDraft: unknow
   }
   state.troops = { infantry: 0, lancer: 0, marksman: 0 };
   const capacity = record(draft.capacities);
-  const total = capacity?.solo_bear;
+  const total = capacity?.[simulator === "beartrap" ? "solo_bear" : "solo_standard"];
   const plan = record(draft.plan);
   const squads = Array.isArray(plan?.squads) ? plan.squads : [];
   const first = record(squads[0]);
@@ -72,4 +72,12 @@ export function applyToolsBeartrapDraft(current: SideState, unknownDraft: unknow
     state.heroes[hero.troopType] = { name: hero.name, skills };
   }
   return state;
+}
+
+export function applyToolsBeartrapDraft(current: SideState, draft: unknown): SideState {
+  return applyToolsDraft(current, draft, "beartrap");
+}
+
+export function applyToolsPvpDraft(current: SideState, draft: unknown): SideState {
+  return applyToolsDraft(current, draft, "pvp");
 }

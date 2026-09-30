@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { defaultSide } from "./form-state";
-import { applyToolsBeartrapDraft } from "./tools-beartrap-draft";
+import { applyToolsBeartrapDraft, applyToolsPvpDraft } from "./tools-beartrap-draft";
 
 test("Beartrap draft maps known tiers and first squad ratio without changing source state", () => {
   const original = defaultSide();
@@ -124,4 +124,27 @@ test("Missing and invalid Tools levels do not create simulator skills", () => {
   assert.equal(result.heroes.lancer.name, "Jessie");
   assert.deepEqual(result.heroes.lancer.skills, [4, 0, 0, 0]);
   assert.deepEqual(result.heroes.marksman.skills, [0, 0, 0, 0]);
+});
+
+test("PvP imports the selected exported squad using standard solo capacity", () => {
+  const original = defaultSide();
+  const result = applyToolsPvpDraft(original, {
+    version: 1, simulator: "pvp", source: "personal",
+    capacities: { solo_standard: 165001, solo_bear: 196050, rally_standard: 1000000 },
+    heroDetails: { mia: { name: "Mia", progress: { skill: 5, weapon: 10 }, skillLevels: { expedition: { "2": 4, "3": 3 } } } },
+    plan: { squads: [{ id: "selected-second", ratio: [45, 5, 50], heroes: ["", "mia", ""] }] },
+  });
+  assert.deepEqual(result.troops, { infantry: 74250, lancer: 8250, marksman: 82501 });
+  assert.deepEqual(result.heroes.lancer, { name: "Mia", skills: [5, 4, 3, 5] });
+  assert.deepEqual(result.stats, original.stats);
+  assert.deepEqual(result.statModifiers, original.statModifiers);
+  assert.deepEqual(result.petModifiers, original.petModifiers);
+  assert.notEqual(result, original);
+  assert.equal(original.troops.infantry, 50000);
+});
+
+test("Beartrap and PvP imports reject each other's drafts", () => {
+  const original = defaultSide();
+  assert.equal(applyToolsPvpDraft(original, { version: 1, simulator: "beartrap" }), original);
+  assert.equal(applyToolsBeartrapDraft(original, { version: 1, simulator: "pvp" }), original);
 });
