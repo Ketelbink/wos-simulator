@@ -33,11 +33,13 @@ npx tsx ../scripts/run_testcases.ts --human --generate-charts   # summary plus s
 `run_testcases.ts --deterministic --exact` runs only deterministic cases and
 requires all compared outcomes to equal the same integer. Stat rounding
 adjustments allow ±0.05 percentage points for 1-decimal inputs and ±0.005 for
-2-decimal inputs. Mixed-precision cases use the tighter bound; inputs with more
+2-decimal inputs; in mixed-precision cases each stat moves in proportion to its own bound. Inputs with more
 than two decimals are not adjusted.
 
-`run_testcases.ts --matching TEXT` selects files whose filename contains `TEXT`
-(case-sensitive). Directory names and testcase contents are not matched.
+`run_testcases.ts --matching TEXT` selects files whose filename or participating
+hero name contains `TEXT` (case-insensitive). Heroes and joiners on either side
+are matched; directory names and descriptions are not. A matching file runs all
+its testcases, subject to other filters such as `--deterministic`.
 
 Simulator-backed operational scripts live at the repo root:
 
@@ -46,6 +48,17 @@ npx tsx scripts/tournament_dual_swiss.ts
 npx tsx scripts/benchmark_tournament_battle_modes.ts 60
 npx tsx scripts/fit_enemy_base_stats.ts --help
 ```
+
+For the three-army tool, `--reps N` sets the total number of matches per evaluation
+in both `sequential` and `random` ordering. For example, `--reps 500` uses 500
+matches per finalist and 50 per preliminary troop candidate in either mode.
+Sequential samples starting orders, plays the three opening slots, then pairs
+the lowest-numbered surviving armies. Random picks a fresh surviving pair before
+each battle. Sequential samples cover all 36 starting-order pairs once per
+seeded, shuffled block and stop at exactly the requested match count.
+The CLI prints the evaluation budget before running; `--seed` makes sampling
+reproducible. To reproduce the previous sequential sample count, multiply the
+old `--reps` value by 36 explicitly.
 
 Config (troop/hero stats, hero definitions) lives in `simulator/config/`. The
 dashboard imports the engine through the `@simulator/*` path alias, which resolves to

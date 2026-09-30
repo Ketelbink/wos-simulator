@@ -1,5 +1,3 @@
-import type { GeneratedDamage } from "./damage";
-
 export type SideId = "attacker" | "defender";
 export type UnitType = "infantry" | "lancer" | "marksman";
 export type DamageKind = "normal" | "skill";
@@ -97,6 +95,8 @@ export interface EffectIntentDefinition {
   applies_to_damage_kinds?: DamageKind[];
   /** Apply this modifier only while the named effect is applicable to the same damage job. */
   requires_effect?: string;
+  /** Engagement skills only: activate this effect only for a line engaged with one of these units. */
+  engaged_with?: UnitType[];
   value_formula?: PercentOfValueFormula;
   value_evolution?: { type?: string; step?: string; value?: number };
   units?: Record<string, unknown>;
@@ -290,8 +290,9 @@ export interface ActiveEffectGroup {
   ordinal: number;
   bucketIndex: number;
   sameEffectStacking: SameEffectStacking;
-  /** Taker-side attack budgets are sampled when captured damage lands, not when it is generated. */
-  attackLimitedTakerModifier: boolean;
+  // Attack-count-limited target-side modifier (e.g. Gwen's Eagle Vision): a "next hit"
+  // debuff consumed by the damage events it applies to.
+  nextHit?: boolean;
   // Prepared dependency lookup indexed by damage-job shape. An empty slot means the
   // required effect cannot apply to that job, so this group must not contribute.
   requiredGroupOrdinalsByJobShape?: Array<number[] | undefined>;
@@ -330,8 +331,6 @@ export interface ActiveEffect {
   uses: number;
   sameEffectStacking: SameEffectStacking;
   triggerEffects?: ResolvedEffectIntentDefinition[];
-  /** Generation-time damage awaiting shield settlement on its later matching attack. */
-  pendingDamageJobs?: PendingDamageJob[];
   effectGroup?: ActiveEffectGroup;
   effectGroupPosition?: number;
 }
@@ -376,11 +375,6 @@ export interface DamageResult {
   kills: number;
   appliedEffects?: AppliedEffect[];
   trace?: DamageEquationTrace;
-}
-
-export interface PendingDamageJob {
-  job: DamageJob;
-  generated: GeneratedDamage;
 }
 
 export interface CounterDelta {

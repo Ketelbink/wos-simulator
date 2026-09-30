@@ -1,0 +1,98 @@
+[
+  {
+    "tracePath": "/home/paul/projects_wsl/wos/simulator/c2/data/runs/2026-09-28T11-57-17.129Z-d4028e1e-1730-4e52-b354-8a6350942045.json",
+    "outputPath": "/home/paul/projects_wsl/wos/simulator/testcases/emulator_verified/skill_buckets_20260928/control_gatot.json",
+    "testId": "control_gatot",
+    "version": 1,
+    "observations": 1,
+    "newVersion": true
+  },
+  {
+    "tracePath": "/home/paul/projects_wsl/wos/simulator/c2/data/runs/2026-09-28T11-57-19.129Z-82839fe4-687d-4555-b57a-5bf731d298f9.json",
+    "outputPath": "/home/paul/projects_wsl/wos/simulator/testcases/emulator_verified/skill_buckets_20260928/control_none.json",
+    "testId": "control_none",
+    "version": 1,
+    "observations": 1,
+    "newVersion": true
+  },
+  {
+    "tracePath": "/home/paul/projects_wsl/wos/simulator/c2/data/runs/2026-09-28T11-57-22.133Z-d2210b4b-5d72-4e97-85f4-36f980d409b2.json",
+    "outputPath": "/home/paul/projects_wsl/wos/simulator/testcases/emulator_verified/skill_buckets_20260928/control_edith.json",
+    "testId": "control_edith",
+    "version": 1,
+    "observations": 1,
+    "newVersion": true
+  },
+  {
+    "tracePath": "/home/paul/projects_wsl/wos/simulator/c2/data/runs/2026-09-28T11-58-47.130Z-8a2afa27-72cb-476f-80c6-f9e7b9e912cf.json",
+    "outputPath": "/home/paul/projects_wsl/wos/simulator/testcases/emulator_verified/skill_buckets_20260928/control_lumak.json",
+    "testId": "control_lumak",
+    "version": 1,
+    "observations": 1,
+    "newVersion": true
+  },
+  {
+    "tracePath": "/home/paul/projects_wsl/wos/simulator/c2/data/runs/2026-09-28T11-58-50.135Z-e3817263-c1e0-4a04-8aec-203b1d5c8db6.json",
+    "outputPath": "/home/paul/projects_wsl/wos/simulator/testcases/emulator_verified/skill_buckets_20260928/control_ling.json",
+    "testId": "control_ling",
+    "version": 1,
+    "observations": 1,
+    "newVersion": true
+  },
+  {
+    "tracePath": "/home/paul/projects_wsl/wos/simulator/c2/data/runs/2026-09-28T11-58-52.138Z-835f14e4-8e33-4f5f-a91d-6e9d35d75b73.json",
+    "outputPath": "/home/paul/projects_wsl/wos/simulator/testcases/emulator_verified/skill_buckets_20260928/control_jessie.json",
+    "testId": "control_jessie",
+    "version": 1,
+    "observations": 1,
+    "newVersion": true
+  },
+  {
+    "tracePath": "/home/paul/projects_wsl/wos/simulator/c2/data/runs/2026-09-28T11-59-55.143Z-9d0d266c-1d92-4ffc-88c9-e2bafbe06fee.json",
+    "outputPath": "/home/paul/projects_wsl/wos/simulator/testcases/emulator_verified/skill_buckets_20260928/edith_lumak.json",
+    "testId": "edith_lumak",
+    "version": 1,
+    "observations": 1,
+    "newVersion": true
+  },
+  {
+    "tracePath": "/home/paul/projects_wsl/wos/simulator/c2/data/runs/2026-09-28T11-59-58.126Z-b3ed1a33-d75c-4323-a002-563e671499a1.json",
+    "outputPath": "/home/paul/projects_wsl/wos/simulator/testcases/emulator_verified/skill_buckets_20260928/gatot_ling.json",
+    "testId": "gatot_ling",
+    "version": 1,
+    "observations": 1,
+    "newVersion": true
+  },
+  {
+    "tracePath": "/home/paul/projects_wsl/wos/simulator/c2/data/runs/2026-09-28T12-01-21.135Z-932aac26-79c8-4ab5-86ad-038e6ca39e00.json",
+    "outputPath": "/home/paul/projects_wsl/wos/simulator/testcases/emulator_verified/skill_buckets_20260928/edith_jessie.json",
+    "testId": "edith_jessie",
+    "version": 1,
+    "observations": 1,
+    "newVersion": true
+  },
+  {
+    "tracePath": "/home/paul/projects_wsl/wos/simulator/c2/data/runs/2026-09-28T12-01-24.139Z-8d199e5a-6c8d-4a33-9700-38923a5fb591.json",
+    "outputPath": "/home/paul/projects_wsl/wos/simulator/testcases/emulator_verified/skill_buckets_20260928/gatot_lumak.json",
+    "testId": "gatot_lumak",
+    "version": 1,
+    "observations": 1,
+    "newVersion": true
+  },
+  {
+    "tracePath": "/home/paul/projects_wsl/wos/simulator/c2/data/runs/2026-09-28T12-02-19.132Z-c704efe9-5f35-4cc7-a1a9-9852a25c61af.json",
+    "outputPath": "/home/paul/projects_wsl/wos/simulator/testcases/emulator_verified/skill_buckets_20260928/edith_ling.json",
+    "testId": "edith_ling",
+    "version": 1,
+    "observations": 1,
+    "newVersion": true
+  },
+  {
+    "tracePath": "/home/paul/projects_wsl/wos/simulator/c2/data/runs/2026-09-28T12-02-22.121Z-96715f93-1687-4860-948e-a5f49a260e2c.json",
+    "outputPath": "/home/paul/projects_wsl/wos/simulator/testcases/emulator_verified/skill_buckets_20260928/gatot_jessie.json",
+    "testId": "gatot_jessie",
+    "version": 1,
+    "observations": 1,
+    "newVersion": true
+  }
+]

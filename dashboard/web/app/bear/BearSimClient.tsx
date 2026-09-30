@@ -960,7 +960,6 @@ export default function BearSimClient({
           setState={setPlayer}
           rallyMode={RALLY_MODE}
           syncStatsOnHeroChange={true}
-          onStatSync={() => undefined}
           loadedPresetName={loadedPresetName}
           onOpenPreset={openPresetModal}
           variant={presentation}
