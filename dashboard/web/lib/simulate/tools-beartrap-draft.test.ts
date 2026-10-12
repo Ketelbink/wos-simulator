@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { defaultSide } from "./form-state";
+import { defaultSide, toApiPayload, applyStatBonusGroups } from "./form-state";
 import { applyToolsBeartrapDraft, applyToolsPvpDraft } from "./tools-beartrap-draft";
 
 test("Beartrap draft maps known tiers and first squad ratio without changing source state", () => {
@@ -148,3 +148,62 @@ test("Beartrap and PvP imports reject each other's drafts", () => {
   assert.equal(applyToolsPvpDraft(original, { version: 1, simulator: "beartrap" }), original);
   assert.equal(applyToolsBeartrapDraft(original, { version: 1, simulator: "pvp" }), original);
 });
+
+const combat = (included: boolean) => ({
+  statsIncludeOwnBuffs: included,
+  stats: Object.fromEntries(["infantry", "lancer", "marksman"].map(type => [type, { attack: 1050, defense: null, lethality: 700, health: 600 }])),
+  modifiers: {
+    statModifiers: { attack: 10, defense: 0, lethality: 0, health: 0, enemy_attack: 10, enemy_defense: 20 },
+    petModifiers: { attack: 5, defense: 0, lethality: 0, health: 0, enemy_defense: 10, enemy_lethality: 5, enemy_health: 5 },
+    gareth: 2.5,
+  },
+});
+
+test("Both Tools destinations import saved stats and temporary buffs without adding pet refinement", () => {
+  for (const simulator of ["beartrap", "pvp"] as const) {
+    const original = defaultSide(), before = structuredClone(original);
+    const draft = { version: 1, simulator, battleStats: combat(false), pets: { attack: 999 }, refinement: { health: 999 } };
+    const result = simulator === "beartrap" ? applyToolsBeartrapDraft(original, draft) : applyToolsPvpDraft(original, draft);
+    assert.equal(result.stats.infantry.attack, 1050);
+    assert.equal(result.stats.infantry.health, 600);
+    assert.equal(result.stats.infantry.defense, original.stats.infantry.defense, "unknown stats retain the form value");
+    assert.equal(result.petModifiers.attack, 5);
+    assert.equal(result.gareth, 2.5);
+    assert.deepEqual(original, before, "input form is unchanged");
+    assert.deepEqual(draft.battleStats, combat(false), "exported snapshot is unchanged");
+  }
+});
+
+test("Stats already containing City/Pet buffs reproduce the observed stat after a single application", () => {
+  const result = applyToolsPvpDraft(defaultSide(), { version: 1, simulator: "pvp", battleStats: combat(true) });
+  assert.ok(Math.abs(result.stats.infantry.attack - 900) < 1e-9);
+  assert.ok(Math.abs(applyStatBonusGroups(result.stats.infantry.attack, result.statModifiers.attack + result.petModifiers.attack, 0) - 1050) < 1e-9);
+  assert.equal(result.stats.infantry.lethality, 700, "enemy debuffs are never removed from own stats");
+});
+
+test("Enemy reductions are negated exactly once at the API boundary", () => {
+  const result = applyToolsPvpDraft(defaultSide(), { version: 1, simulator: "pvp", battleStats: combat(false) });
+  const payload = toApiPayload(result, defaultSide(), 1, true);
+  assert.equal(payload.attacker.stat_modifiers?.enemy_attack, -10);
+  assert.equal(payload.attacker.stat_modifiers?.enemy_defense, -20);
+  assert.equal(payload.attacker.pet_modifiers?.enemy_defense, -10);
+  assert.equal(payload.attacker.pet_modifiers?.enemy_lethality, -5);
+  assert.equal(payload.attacker.pet_modifiers?.enemy_health, -5);
+  assert.equal(payload.attacker.gareth, 2.5);
+});
+
+test("Missing, ambiguous and malformed combat blocks cannot silently overwrite the form", () => {
+  for (const mutate of [
+    (value: ReturnType<typeof combat>) => { delete (value as Partial<typeof value>).statsIncludeOwnBuffs; },
+    (value: ReturnType<typeof combat>) => { value.modifiers.petModifiers.attack = 11; },
+    (value: ReturnType<typeof combat>) => { value.modifiers.petModifiers.enemy_defense = -10; },
+    (value: ReturnType<typeof combat>) => { value.modifiers.gareth = 0.1; },
+    (value: ReturnType<typeof combat>) => { value.stats.infantry.attack = NaN; },
+  ]) {
+    const original = defaultSide(), value = combat(false); mutate(value);
+    const result = applyToolsBeartrapDraft(original, { version: 1, simulator: "beartrap", battleStats: value });
+    assert.deepEqual(result.stats, original.stats);
+    assert.deepEqual(result.petModifiers, original.petModifiers);
+  }
+});
+
