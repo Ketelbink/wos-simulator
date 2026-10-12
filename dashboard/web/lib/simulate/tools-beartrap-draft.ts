@@ -1,5 +1,6 @@
 import { HEROES, TROOP_TIERS, skillSlotEnabled, type TroopCategory } from "@/lib/heroes-catalogue";
 import type { SideState } from "@/lib/simulate/form-state";
+import { applyToolsCombatDraft } from "./tools-combat-draft";
 
 type RecordValue = Record<string, unknown>;
 const categories: TroopCategory[] = ["infantry", "lancer", "marksman"];
@@ -71,7 +72,7 @@ function applyToolsDraft(current: SideState, unknownDraft: unknown, simulator: "
     }
     state.heroes[hero.troopType] = { name: hero.name, skills };
   }
-  return state;
+  return applyToolsCombatDraft(state, draft.combat);
 }
 
 export function applyToolsBeartrapDraft(current: SideState, draft: unknown): SideState {
