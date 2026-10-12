@@ -82,4 +82,3 @@ export function applyToolsBeartrapDraft(current: SideState, draft: unknown): Sid
 export function applyToolsPvpDraft(current: SideState, draft: unknown): SideState {
   return applyToolsDraft(current, draft, "pvp");
 }
-

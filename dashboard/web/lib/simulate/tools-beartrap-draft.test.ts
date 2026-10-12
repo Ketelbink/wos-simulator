@@ -206,4 +206,3 @@ test("Missing, ambiguous and malformed combat blocks cannot silently overwrite t
     assert.deepEqual(result.petModifiers, original.petModifiers);
   }
 });
-
